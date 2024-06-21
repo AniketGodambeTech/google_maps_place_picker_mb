@@ -277,70 +277,65 @@ class _PlacePickerState extends State<PlacePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () {
-          searchBarController.clearOverlay();
-          return Future.value(true);
-        },
-        child: FutureBuilder<PlaceProvider>(
-          future: _futureProvider,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasData) {
-              provider = snapshot.data;
-              return MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<PlaceProvider>.value(value: provider!),
-                ],
-                child: Stack(children: [
-                  Scaffold(
-                    key: ValueKey<int>(provider.hashCode),
-                    resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
-                    extendBodyBehindAppBar: true,
-                    appBar: AppBar(
-                      key: appBarKey,
-                      automaticallyImplyLeading: false,
-                      iconTheme: Theme.of(context).iconTheme,
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                      titleSpacing: 0.0,
-                      title: _buildSearchBar(context),
-                    ),
-                    body: _buildMapWithLocation(),
-                  ),
-                  _buildIntroModal(context),
-                ]),
-              );
-            }
-
-            final children = <Widget>[];
-            if (snapshot.hasError) {
-              children.addAll([
-                Icon(
-                  Icons.error_outline,
-                  color: Theme.of(context).colorScheme.error,
+    return FutureBuilder<PlaceProvider>(
+      future: _futureProvider,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData) {
+          provider = snapshot.data;
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider<PlaceProvider>.value(value: provider!),
+            ],
+            child: Stack(children: [
+              Scaffold(
+                key: ValueKey<int>(provider.hashCode),
+                resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
+                extendBodyBehindAppBar: true,
+                appBar: AppBar(
+                  key: appBarKey,
+                  automaticallyImplyLeading: false,
+                  iconTheme: Theme.of(context).iconTheme,
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  titleSpacing: 0.0,
+                  title: _buildSearchBar(context),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text('Error: ${snapshot.error}'),
-                )
-              ]);
-            } else {
-              children.add(CircularProgressIndicator());
-            }
-
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: children,
-                ),
+                body: _buildMapWithLocation(),
               ),
-            );
-          },
-        ));
+              _buildIntroModal(context),
+            ]),
+          );
+        }
+
+        final children = <Widget>[];
+        if (snapshot.hasError) {
+          children.addAll([
+            Icon(
+              Icons.error_outline,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Text('Error: ${snapshot.error}'),
+            )
+          ]);
+        } else {
+          children.add(CircularProgressIndicator());
+        }
+
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: children,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildSearchBar(BuildContext context) {
